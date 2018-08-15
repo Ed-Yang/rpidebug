@@ -1,0 +1,57 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Remote GDB",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/home/pi/program/hello",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "/home/pi/program",
+            "environment": [],
+            "externalConsole": true,
+            "pipeTransport": {
+                "pipeCwd": "/usr/bin",
+                "pipeProgram": "/usr/bin/ssh",
+                "pipeArgs": [
+                    "pi@rpi3"
+                ],
+                "debuggerPath": "/usr/bin/gdb"
+            },
+            "sourceFileMap": {
+                // "remote": "local"
+                "/build/": "${workspaceFolder}"
+            },
+            //"logging": { "engineLogging": true, "trace": true, "traceResponse": true },
+            "MIMode": "gdb"
+        },
+        {
+            "name": "Remote GDB Server",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/build/hello",
+            "miDebuggerServerAddress": "localhost:9091",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${workspaceRoot}",
+            "environment": [],
+            "externalConsole": true,
+            // without preLaunchTask, on HOST run: ssh -L9091:localhost:9091 pi@rpi3  gdbserver :9091 ~/program/hello
+            "preLaunchTask": "gdbserver",
+            //"serverStarted": "Listening on port",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            //"logging": { "engineLogging": true, "trace": true, "traceResponse": true },
+            "MIMode": "gdb",
+        },
+    ]
+}

@@ -1,0 +1,17 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "gdbserver",
+            "type": "shell",
+            "command": "ssh -L9091:localhost:9091 pi@rpi3 'gdbserver :9091 ~/program/hello'",
+            "isBackground": true,
+            //"identifier": "gdbserver",
+            //"promptOnClose": false,
+            //"isShellCommand": true, <-- replace by type = shell
+            //"problemMatcher": []
+        }
+    ]
+}
