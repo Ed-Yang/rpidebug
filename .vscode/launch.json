@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Remote GDB",
+            "name": "GDB Tunnel",
             "type": "cppdbg",
             "request": "launch",
             "program": "/home/pi/program/hello",
@@ -13,7 +13,7 @@
             "stopAtEntry": true,
             "cwd": "/home/pi/program",
             "environment": [],
-            "externalConsole": true,
+            "externalConsole": false,
             "pipeTransport": {
                 "pipeCwd": "/usr/bin",
                 "pipeProgram": "/usr/bin/ssh",
@@ -27,10 +27,44 @@
                 "/build/": "${workspaceFolder}"
             },
             //"logging": { "engineLogging": true, "trace": true, "traceResponse": true },
-            "MIMode": "gdb"
+            "MIMode": "gdb",
+            "setupCommands": [
+                {"text": "set startup-with-shell off"},
+                {"text": "set gnutarget elf32-littlearm"},
+                {"text": "b echo"},  // set breakpoint here seems not working
+            ]
         },
         {
-            "name": "Remote GDB Server",
+            "name": "GDB Tunnel (PPP)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/home/pi/program/hello",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "/home/pi/program",
+            "environment": [],
+            "externalConsole": false,
+            "pipeTransport": {
+                "pipeCwd": "/usr/bin",
+                "pipeProgram": "/usr/bin/ssh",
+                "pipeArgs": [
+                    "pi@10.0.5.2"
+                ],
+                "debuggerPath": "/usr/bin/gdb"
+            },
+            "sourceFileMap": {
+                // "remote": "local"
+                "/build/": "${workspaceFolder}"
+            },
+            //"logging": { "engineLogging": true, "trace": true, "traceResponse": true },
+            "MIMode": "gdb",
+            "setupCommands": [
+                {"text": "set startup-with-shell off"},
+                {"text": "set gnutarget elf32-littlearm"}
+            ]
+        },
+        {
+            "name": "GDB Server",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceRoot}/build/hello",
@@ -39,19 +73,20 @@
             "stopAtEntry": true,
             "cwd": "${workspaceRoot}",
             "environment": [],
-            "externalConsole": true,
+            "externalConsole": false,
             // without preLaunchTask, on HOST run: ssh -L9091:localhost:9091 pi@rpi3  gdbserver :9091 ~/program/hello
             "preLaunchTask": "gdbserver",
-            //"serverStarted": "Listening on port",
+            "serverStarted": "Listening on port",
+            "filterStderr": true,
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
+                    "text": "enable-pretty-printing",
                     "ignoreFailures": true
                 }
             ],
             //"logging": { "engineLogging": true, "trace": true, "traceResponse": true },
             "MIMode": "gdb",
-        },
+        }
     ]
 }
