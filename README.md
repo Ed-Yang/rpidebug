@@ -144,8 +144,10 @@ Ex.
 ## Remote GDB Server
 
 We use "preLaunchTask" which define a custom task to initialize a gdbserver on the
-target.  Somehow, the VSCode IDE will pop a dialog after press the debug button. It
-is needed to clock the "Debug anyway" to start the degugging.
+target.  
+
+** Note, If you did not define "problemMatcher, after press the debug button, the VSCode IDE will pop a dialog. 
+It is needed to clock the "Debug anyway" to start the degugging. [The specified task cannot be tracked.](https://stackoverflow.com/questions/48169485/stall-when-debugging-with-gdbserver-in-vscode-the-prelaunchtask-docker-gdb/50607478#50607478)
 
 ![debug any way](images/debug-anyway.png)
 
@@ -153,34 +155,44 @@ is needed to clock the "Debug anyway" to start the degugging.
 
 ```json
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
         {
-            "name": "Remote GDB Server",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceRoot}/build/hello",
-            "miDebuggerServerAddress": "localhost:9091",
-            "args": [],
-            "stopAtEntry": true,
-            "cwd": "${workspaceRoot}",
-            "environment": [],
-            "externalConsole": true,
-            // without preLaunchTask, on HOST run: ssh -L9091:localhost:9091 pi@rpi3  gdbserver :9091 ~/program/hello
-            "preLaunchTask": "gdbserver",
-            //"serverStarted": "Listening on port",
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                }
-            ],
-            //"logging": { "engineLogging": true, "trace": true, "traceResponse": true },
-            "MIMode": "gdb",
+            "label": "gdbserver",
+            "type": "shell",
+            "command": "ssh -L9091:localhost:9091 pi@rpi3 'gdbserver :9091 ~/program/hello'",
+            "isBackground": true,
+            //"isShellCommand": true, <-- replace by type = shell
+            "problemMatcher": {
+                "owner": "gdbserver",
+                "fileLocation": "relative",
+                "pattern": [
+                    {
+                        "regexp": "^not\\sok\\s\\d+\\s(.*)$"
+                    },
+                    {
+                        "regexp": "\\s+(.*)$",
+                        "message": 1
+                    },
+                    {
+                        "regexp": "\\s+at\\s(.*):(\\d+):(\\d+)$",
+                        "file": 1,
+                        "line": 2,
+                        "column": 3
+                    }
+                ],
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": {
+                        "regexp": "Process*"
+                    },
+                    "endsPattern": {
+                        "regexp": "Listening on port*"
+                    }
+                },
+            }
         }
     ]
 }

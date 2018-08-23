@@ -8,10 +8,35 @@
             "type": "shell",
             "command": "ssh -L9091:localhost:9091 pi@rpi3 'gdbserver :9091 ~/program/hello'",
             "isBackground": true,
-            //"identifier": "gdbserver",
-            //"promptOnClose": false,
             //"isShellCommand": true, <-- replace by type = shell
-            //"problemMatcher": []
+            "problemMatcher": {
+                "owner": "gdbserver",
+                "fileLocation": "relative",
+                "pattern": [
+                    {
+                        "regexp": "^not\\sok\\s\\d+\\s(.*)$"
+                    },
+                    {
+                        "regexp": "\\s+(.*)$",
+                        "message": 1
+                    },
+                    {
+                        "regexp": "\\s+at\\s(.*):(\\d+):(\\d+)$",
+                        "file": 1,
+                        "line": 2,
+                        "column": 3
+                    }
+                ],
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": {
+                        "regexp": "Process*"
+                    },
+                    "endsPattern": {
+                        "regexp": "Listening on port*"
+                    }
+                },
+            }
         }
     ]
 }
