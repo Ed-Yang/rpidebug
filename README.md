@@ -146,12 +146,52 @@ Ex.
 We use "preLaunchTask" which define a custom task to initialize a gdbserver on the
 target.  
 
-** Note, If you did not define "problemMatcher, after press the debug button, the VSCode IDE will pop a dialog. 
+** Note, If you did not define "problemMatcher, after press the debug button, the VSCode IDE will pop a dialog.
 It is needed to clock the "Debug anyway" to start the degugging. [The specified task cannot be tracked.](https://stackoverflow.com/questions/48169485/stall-when-debugging-with-gdbserver-in-vscode-the-prelaunchtask-docker-gdb/50607478#50607478)
 
 ![debug any way](images/debug-anyway.png)
 
-.vscode/launch.jon
+.vscode/launch.json
+
+```json
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "GDB Server",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/build/hello",
+            "miDebuggerServerAddress": "localhost:9091",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${workspaceRoot}",
+            "environment": [],
+            "externalConsole": false,
+            // without preLaunchTask, on HOST run: ssh -L9091:localhost:9091 pi@rpi3  gdbserver :9091 ~/program/hello
+            "preLaunchTask": "gdbserver",
+            "serverStarted": "Listening on port",
+            "filterStderr": true,
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "enable-pretty-printing",
+                    "ignoreFailures": true,
+                },
+                {"text": "set startup-with-shell off"},
+                {"text": "set gnutarget elf32-littlearm"}
+            ],
+            //"logging": { "engineLogging": true, "trace": true, "traceResponse": true },
+            "MIMode": "gdb",
+        }
+    ]
+}
+```
+
+.vscode/tasks.json
 
 ```json
 {
@@ -193,28 +233,6 @@ It is needed to clock the "Debug anyway" to start the degugging. [The specified 
                     }
                 },
             }
-        }
-    ]
-}
-```
-
-.vscode/tasks.jon
-
-```json
-{
-    // See https://go.microsoft.com/fwlink/?LinkId=733558
-    // for the documentation about the tasks.json format
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "gdbserver",
-            "type": "shell",
-            "command": "ssh -L9091:localhost:9091 pi@rpi3 'gdbserver :9091 ~/program/hello'",
-            "isBackground": true,
-            //"identifier": "gdbserver",
-            //"promptOnClose": false,
-            //"isShellCommand": true, <-- replace by type = shell
-            //"problemMatcher": []
         }
     ]
 }
